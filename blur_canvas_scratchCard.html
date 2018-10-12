@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="height=device-height,width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>刮刮卡</title>
+    <link rel="stylesheet" type="text/css" href="css/blur_canvas.css">
+</head>
+
+<body>
+    <div class="wrapper" id="wrapper">
+        <img src="images/scratchCard.jpg" alt="背景图" id="blur-image">
+        <canvas id="canvas"></canvas>
+    </div>
+    <script>
+    var wrapper = document.getElementById('wrapper');
+    var blurImage = document.getElementById('blur-image');
+
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+    var image = new Image();
+    var diagonalLength, //对角线长度
+        leftMargin = 0, //图片左边距（自适应方法是根据屏幕大小截取图片中间部分显示）
+        topMargin = 0,
+        x = 0,
+        y = 0, //鼠标坐标
+        radius = 15,
+        isMouseDown = false; //判断是否点击
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    // console.log(canvas.height);
+    image.src = 'images/scratchCard.jpg';
+    image.onload = function() {
+        wrapper.style.width = canvas.width + 'px'; //赋值外边框宽高
+        wrapper.style.height = canvas.height + 'px';
+
+        blurImage.style.width = image.width + 'px'; //赋值图片宽高
+        blurImage.style.height = image.height + 'px';
+
+        leftMargin = (image.width - canvas.width) / 2;
+        topMargin = (image.height - canvas.height) / 2;
+        blurImage.style.left = String(-leftMargin) + 'px'; //赋值图片位置(因为有可能图片比屏幕小)
+        blurImage.style.top = String(-topMargin) + 'px';
+
+        if (/Android|webOS|iPhone|iPad|BlackBerry/i.test(navigator.userAgent)) {
+            canvas.addEventListener('touchstart', touchEvent, false);
+            canvas.addEventListener('touchmove', touchEvent, false);
+            canvas.addEventListener('touchend', touchEvent, false);
+        } else {
+            canvas.addEventListener('mousedown', mouseEvent, false);
+            canvas.addEventListener('mouseup', mouseEvent, false);
+            canvas.addEventListener('mouseout', mouseEvent, false);
+            canvas.addEventListener('mousemove', mouseEvent, false);
+        } 
+    };
+    // 触摸不同事件的不同行为
+    function touchEvent(event) {
+        event = event || window.event;
+        event.preventDefault();
+        // console.log(event.type); 
+        switch(event.type) {
+            case 'touchstart':
+                isMouseDown = true;
+                touchSmear(event);
+                break;
+            case 'touchmove':
+                if (isMouseDown) {
+                    touchSmear(event);
+                }
+                break;
+            case 'touchend':
+                isMouseDown = false;
+                break;
+        }
+    }
+    // 鼠标不同事件的不同行为
+    function mouseEvent(event) {
+        event = event || window.event;
+        event.preventDefault();
+        switch(event.type || event.srcElement) {
+            case 'mousedown':
+                isMouseDown = true;
+                mouseSmear(event);
+                break;
+            case 'mousemove':
+                if (isMouseDown) {
+                    mouseSmear(event);
+                }
+                break;
+            case 'mouseout':
+                isMouseDown = false;
+                break;
+            case 'mouseup':
+                isMouseDown = false;
+                break;
+        }    
+    }
+    // 根据坐标绘制涂抹效果
+    function touchSmear(event) {
+        x = event.touches[0].clientX - canvas.getBoundingClientRect().left;
+        y = event.touches[0].clientY - canvas.getBoundingClientRect().top;
+        drawClip(x, y, radius);
+    }
+    function mouseSmear(event) {
+        x = event.clientX - canvas.getBoundingClientRect().left;
+        y = event.clientY - canvas.getBoundingClientRect().top;
+        drawClip(x, y, radius);
+    }
+    // 圆形剪切图片显示
+    function drawClip(x, y, r) {
+        context.save();
+
+        context.beginPath();
+        context.arc(x, y, r, 0, Math.PI * 2);
+
+        context.clip();
+        // 复杂写法是为了兼容图片宽高小于画布宽高
+        context.drawImage(image, Math.max(leftMargin, 0), Math.max(topMargin, 0), Math.min(canvas.width, image.width), Math.min(canvas.height, image.height), Math.max(0, -leftMargin), Math.max(0, -topMargin), Math.min(canvas.width, image.width), Math.min(canvas.height, image.height));
+
+        context.restore();
+    }
+    </script>
+</body>
+
+</html>

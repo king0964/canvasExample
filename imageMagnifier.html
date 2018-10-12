@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>imageMagnifier</title>
+</head>
+
+<body>
+    <canvas id="canvas" style="display: block; margin: 0 auto;">您的浏览器尚不支持Canvas</canvas>
+    <canvas id="offCanvas" style="display: none; margin: 0 auto; border: 1px solid #eee;">您的浏览器尚不支持Canvas</canvas>
+    <script>
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+    var image = new Image();
+
+    var offCanvas = document.getElementById('offCanvas');
+    var offContext = offCanvas.getContext('2d');
+
+    var scale = 0; //缩放比例
+    var point; //存放坐标位置
+    var isMouseDown = false; //是否按下鼠标
+
+    canvas.width = 902;
+    canvas.height = 600;
+
+    window.onload = function() {
+        image.src = 'images/img_lg.jpg';
+        image.onload = function() {
+            offCanvas.width = image.width;
+            offCanvas.height = image.height;
+            scale = offCanvas.width / canvas.width; //由于刚好宽高比例一样
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+            offContext.drawImage(image, 0, 0);
+        };
+    };
+
+    // 画布鼠标各种事件
+    canvas.onmousedown = function(event) {
+    	event.preventDefault();
+    	isMouseDown = true;
+        point = windowToCanvas(event.clientX, event.clientY);
+        // console.log(point);
+        drawCanvasWithMagnifier(true, point);
+    };
+    canvas.onmousemove = function(event) {
+    	event.preventDefault();
+    	if (isMouseDown) {
+    		point = windowToCanvas(event.clientX, event.clientY);
+        	drawCanvasWithMagnifier(true, point);
+    	}
+    };
+    canvas.onmouseup = function(event) {
+    	event.preventDefault();
+    	isMouseDown = false;
+    	drawCanvasWithMagnifier(false);
+    };
+    canvas.onmouseout = function(event) {
+    	event.preventDefault();
+    	isMouseDown = false;
+    	drawCanvasWithMagnifier(false);
+    };
+
+    // 判断是否绘制放大镜
+    function drawCanvasWithMagnifier(isShowMagnifier, point) {
+    	context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        if (isShowMagnifier) {
+        	drawMagnifier(point);
+        }
+    }
+    // 绘制放大镜
+    function drawMagnifier(point) {
+    	var r = 100; //放大镜的半径
+    	var dx = point.x;
+    	var dy = point.y;
+    	// console.log(dx + ' ' + dy);
+    	var sx = dx * scale - r;
+        var sy = dy * scale - r;
+       	
+       	context.save();
+       	context.beginPath();
+       	context.arc(dx, dy, r, 0, 2 * Math.PI);
+
+       	context.lineWidth = 10.0;
+        context.strokeStyle = "#069";
+
+       	context.stroke();
+       	context.clip();
+        context.drawImage(offCanvas, sx, sy, 2 * r, 2 * r, dx - r, dy - r, 2 * r, 2 * r);
+        context.restore();
+    }
+    // 点击点坐标从window换成canvas的坐标
+    function windowToCanvas(x, y) {
+        var bbox = canvas.getBoundingClientRect();
+        return { 
+        	x: x - bbox.left,
+        	y: y - bbox.top 
+        };
+    }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>searchLight</title>
+</head>
+
+<body>
+    <canvas id="canvas" style="border: 1px solid #000; margin: 50px auto; display: block;">浏览器不兼容canvas，请更换浏览器</canvas>
+    <script>
+    var searchLight = {
+        x: 300,
+        y: 300,
+        radius: 100,
+        vx: Math.random() * 5 + 5,
+        vy: Math.random() * 5 + 5
+    };
+    var flag = false;//用于判断半径递增还是递减
+    window.onload = function() {
+        var canvas = document.getElementById('canvas');
+        canvas.width = 600;
+        canvas.height = 600;
+        // 绘图环境
+        var context = canvas.getContext('2d');
+
+        setInterval(function() {
+            draw(context, canvas.width, canvas.height);
+            updateBall(canvas.width, canvas.height);
+        }, 40);
+    };
+    // 绘制文字和探照灯
+    function draw(ctx, width, height) {
+        // console.log(searchLight);
+        ctx.clearRect(0, 0, width, height);
+        ctx.save();
+        // 绘制背景
+        ctx.beginPath();
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, width, height);
+        ctx.beginPath();
+        ctx.arc(searchLight.x, searchLight.y, searchLight.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.clip();
+        // 绘制文字
+        ctx.beginPath();
+        ctx.fillStyle = '#058';
+        ctx.font = 'bold 100px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('First Canvas', width / 2, height / 4);
+        ctx.fillText('Canvas', width / 2, height / 2);
+        ctx.fillText('Last Canvas', width / 2, height * 3 / 4);
+        ctx.restore();
+    }
+    // 更新小球位置
+    function updateBall(width, height) {
+        // 探照灯变大变小交互
+        // if (!flag) {
+        //     searchLight.radius += 5;
+        //     if (searchLight.radius >= 400) {
+        //         searchLight.radius = 400;
+        //         flag = true;
+        //     }
+        // } else {
+        //     searchLight.radius -= 5;
+        //     if (searchLight.radius <= 0) {
+        //         searchLight.radius = 0;
+        //         flag = false;
+        //     }
+        // }
+
+
+        // 探照灯落球式运动
+        searchLight.x += searchLight.vx;
+        searchLight.y += searchLight.vy;
+        // 判断不要超出画布，并做成反弹效果
+        if (searchLight.y >= height - searchLight.radius) {
+            searchLight.y = height - searchLight.radius;
+            searchLight.vy = -searchLight.vy;
+        }
+        if (searchLight.y <= searchLight.radius) {
+            searchLight.y = searchLight.radius;
+            searchLight.vy = -searchLight.vy;
+        }
+        if (searchLight.x <= searchLight.radius) {
+            searchLight.x = searchLight.radius;
+            searchLight.vx = -searchLight.vx;
+        }
+        if (searchLight.x >= width - searchLight.radius) {
+            searchLight.x = width - searchLight.radius;
+            searchLight.vx = -searchLight.vx;
+        }
+    }
+    </script>
+</body>
+
+</html>

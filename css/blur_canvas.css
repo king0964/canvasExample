@@ -1,0 +1,40 @@
+* {
+	padding: 0;
+	margin: 0;
+}
+.wrapper {
+	position: relative;
+	/*width: 902px;
+	height: 600px;*/
+	margin: 0 auto;
+	overflow: hidden;
+}
+.wrapper img {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: -1;
+	-webkit-filter: blur(50px);
+	-moz-filter: blur(50px);
+	-ms-filter: blur(50px); /*不兼容IE*/
+	-o-filter: blur(50px);
+	filter: blur(50px);
+}
+#canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 99;
+}
+.button {
+	position: absolute;
+	top: 90%;
+	z-index: 100;
+	width: 100%;
+	text-align: center;
+}
+.button button {
+	width: 60px;
+	height: 30px;
+	margin: 0 5px;
+}

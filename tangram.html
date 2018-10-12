@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>tangram</title>
+</head>
+
+<body>
+    <canvas id="canvas" style="margin: 50px auto; display: block;">浏览器不兼容canvas，请更换浏览器</canvas>
+    <script>
+    var tangram = [ //数组
+        { p: [{ x: 0, y: 0 }, { x: 400, y: 0 }, { x: 200, y: 200 }], color: "#caff67" }, //类的对象
+        { p: [{ x: 0, y: 0 }, { x: 200, y: 200 }, { x: 0, y: 400 }], color: "#67bcef" },
+        { p: [{ x: 400, y: 0 }, { x: 400, y: 200 }, { x: 300, y: 300 }, { x: 300, y: 100 }], color: "#ef3d61" },
+        { p: [{ x: 300, y: 100 }, { x: 300, y: 300 }, { x: 200, y: 200 }], color: "#f9f51a" },
+        { p: [{ x: 200, y: 200 }, { x: 300, y: 300 }, { x: 200, y: 400 }, { x: 100, y: 300 }], color: "#a594c0" },
+        { p: [{ x: 100, y: 300 }, { x: 200, y: 400 }, { x: 0, y: 400 }], color: "#fa8ccc" },
+        { p: [{ x: 400, y: 200 }, { x: 400, y: 400 }, { x: 200, y: 400 }], color: "#f6ca29" }
+    ];
+    window.onload = function() {
+        var canvas = document.getElementById('canvas');
+        canvas.width = 400;
+        canvas.height = 400;
+
+        var context = canvas.getContext('2d');
+        for (var i = 0; i < tangram.length; i++) {
+            draw(tangram[i], context);
+        }
+
+        function draw(piece, cxt) {
+            cxt.beginPath();
+            cxt.moveTo(piece.p[0].x, piece.p[0].y);
+            for (var j = 0; j < piece.p.length; j++) {
+                cxt.lineTo(piece.p[j].x, piece.p[j].y);
+            }
+            cxt.closePath();
+            cxt.fillStyle = piece.color;
+            cxt.strokeStyle = 'black';
+
+            cxt.fill();
+            cxt.stroke();
+        }
+    };
+    </script>
+</body>
+
+</html>

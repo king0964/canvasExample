@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>snowflake</title>
+    <style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        #wrapper {
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+        <canvas id="canvas"></canvas>
+    </div>
+    <script type="text/javascript">
+    window.addEventListener('resize', resize);
+    var wrapper = document.getElementById('wrapper');
+    var canvas = document.getElementById('canvas'); //canvas的dom对象
+    var ctx = canvas.getContext('2d'); //上下文
+    var center; //显示界面canvas画布半径/中心
+    var canvasSnow; //基础雪花图案
+    var snowNum = 1; //控制边长数量
+    var isAdd = true; //判断增减
+    var SCREEN_W; //存储屏幕宽度
+    var SCREEN_H;
+    resize();
+
+    function resize() {
+        SCREEN_W = window.innerWidth; //获取屏幕宽度
+        SCREEN_H = window.innerHeight;
+        canvas.setAttribute('width', SCREEN_W); //以屏幕宽度为宽画图
+        canvas.setAttribute('height', SCREEN_H);
+        canvas.style.width = SCREEN_W + 'px';
+        canvas.style.height = SCREEN_H + 'px';
+        wrapper.style.width = SCREEN_W + 'px';
+        wrapper.style.height = SCREEN_H + 'px';
+        ctx.lineWidth = 2; //1px细线，画布尺寸为其两倍
+        center = Math.min(SCREEN_W, SCREEN_H) / 2;
+        ctx.translate(SCREEN_W / 2, SCREEN_H / 2); //位移到画布中心点
+
+        snowNum = 6; //必须大于等于1
+        drawCanvas();
+        var loop = setInterval(function() {
+                drawCanvas();
+            }, 50);
+    }
+
+    function drawCanvas() {
+        //设置旋转效果
+        if (snowNum >= 10) { isAdd = false; } //最大个数为18
+        else if (snowNum <= 1) { isAdd = true; } //最小个数为1
+        if (isAdd) { snowNum += snowNum / 200; } //达到最大后开始递减
+        else { snowNum -= snowNum / 100; } //达到最少后开始递增
+        //画图
+        var rSnow = center / 6; //设置雪花图案显示尺寸
+        canvasSnow = drawCanvasSnow(rSnow); //获取离屏雪花图案
+        ctx.clearRect(-SCREEN_W / 2, -SCREEN_H / 2, canvas.width, canvas.height); //清除画布
+        for (var i = 0; i < snowNum; i++) { //开始画图
+            drawSnowAngle(ctx, center - 1.6 * rSnow, i / snowNum, rSnow * 2);  //0.6rSnor的尺寸
+        }
+    }
+    // 封装一个根据旋转加载离屏canvas的函数
+    // r为雪花图案中心距画布中心的距离
+    // angle为雪花图案在画布上的安放角度
+    // size为雪花图案的显示尺寸
+    function drawSnowAngle(ctx, r, angle, size) {
+        ctx.save();
+        ctx.rotate(Math.PI * 2 * angle);
+        drawLine(ctx, 0, 0, r, 0, "#656565");
+        ctx.drawImage(canvasSnow, 0, 0, canvasSnow.width, canvasSnow.height,
+            r - size / 2, -size / 2, size, size);
+        ctx.restore();
+    }
+    // 画出完整的雪花
+    function drawCanvasSnow(centerSnow) {
+        var canvasSnow = document.createElement('canvas');
+        var ctxSnow = canvasSnow.getContext('2d');
+        canvasSnow.setAttribute('width', centerSnow * 2);
+        canvasSnow.setAttribute('height', centerSnow * 2);
+        //画一个大雪花
+        var bigSnow = canvasSingleSnow(centerSnow);
+        ctxSnow.drawImage(bigSnow, 0, 0, bigSnow.width, bigSnow.height,
+            0, 0, centerSnow * 2, centerSnow * 2);
+        //画六个小雪花
+        var smallSnow = canvasSingleSnow(centerSnow / 3);
+        var sizeSnow = centerSnow * 3 / 5; //小雪花的尺寸(直径)
+        var rSnow = centerSnow - sizeSnow / 2; //小雪花的位置(离大雪花中心的距离)
+        for (var i = 0; i < 6; i++) {
+            ctxSnow.save();
+            ctxSnow.translate(centerSnow, centerSnow);
+            ctxSnow.rotate(Math.PI * 2 * i / 6);
+            ctxSnow.drawImage(smallSnow, 0, 0, smallSnow.width, smallSnow.height,
+                rSnow - sizeSnow / 2, -sizeSnow / 2, sizeSnow, sizeSnow);
+            ctxSnow.restore();
+        }
+        return canvasSnow;
+    }
+    // 画雪花的六条线
+    function canvasSingleSnow(snowSize) {
+        var singleSnow = document.createElement('canvas');
+        var ctxSingle = singleSnow.getContext('2d');
+        singleSnow.setAttribute('width', snowSize * 2);
+        singleSnow.setAttribute('height', snowSize * 2);
+        ctxSingle.translate(snowSize, snowSize); //定位原点到画布中心
+        for (var i = 0; i < 6; i++) { //画六条线
+            ctxSingle.save();
+            ctxSingle.rotate(Math.PI * 2 * i / 6);
+            drawLine(ctxSingle, 0, 0, snowSize, 0, "#656565");
+            ctxSingle.restore();
+        }
+        return singleSnow;
+    }
+    // 封装画线函数
+    function drawLine(ctx, x1, y1, x2, y2, color) {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+    }
+    </script>
+</body>
+
+</html>

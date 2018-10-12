@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>extend</title>
+</head>
+
+<body>
+    <h3>规则图形</h3>
+    <canvas id="strokeStar" style="border: 1px solid #eee;">浏览器不兼容canvas，请更换浏览器</canvas>
+    <canvas id="strokePolygon" style="border: 1px solid #eee;">浏览器不兼容canvas，请更换浏览器</canvas>
+    <canvas id="strokeMoon" style="border: 1px solid #eee;">浏览器不兼容canvas，请更换浏览器</canvas>
+    <h3>不规则图形</h3>
+    <canvas id="strokeRose" style="border: 1px solid #eee;">浏览器不兼容canvas，请更换浏览器</canvas>
+    <canvas id="strokeHeart" style="border: 1px solid #eee;">浏览器不兼容canvas，请更换浏览器</canvas>
+    <canvas id="strokeSnowFlake" style="border: 1px solid #eee;">浏览器不兼容canvas，请更换浏览器</canvas>
+    <script src="js/graphicsLibrary.js"></script>
+    <script>
+    // 五角星
+    var strokeStar = document.getElementById('strokeStar');
+    var starContext = strokeStar.getContext('2d');
+    // 多边形
+    var strokePolygon = document.getElementById('strokePolygon');
+    var polygonContext = strokePolygon.getContext('2d');
+    // 月亮
+    var strokeMoon = document.getElementById('strokeMoon');
+    var moonContext = strokeMoon.getContext('2d');
+    // 玫瑰线
+    var strokeRose = document.getElementById('strokeRose');
+    var roseContext = strokeRose.getContext('2d');
+    // 心形
+    var strokeHeart = document.getElementById('strokeHeart');
+    var heartContext = strokeHeart.getContext('2d');
+    // 雪花
+    var strokeSnowFlake = document.getElementById('strokeSnowFlake');
+    var snowFlakeContext = strokeSnowFlake.getContext('2d');
+
+    window.onload = function() {
+        strokeStar.width = 200;
+        strokeStar.height = 100;
+
+        strokePolygon.width = 200;
+        strokePolygon.height = 100;
+
+        strokeMoon.width = 200;
+        strokeMoon.height = 100;
+
+        strokeRose.width = 200;
+        strokeRose.height = 100;
+
+        strokeHeart.width = 200;
+        strokeHeart.height = 100;
+
+        strokeSnowFlake.width = 200;
+        strokeSnowFlake.height = 100;
+
+        // 规则图形参数(r-半径, x-x坐标, y-y坐标, rot-旋转角度, strokeColor-可选，线颜色, millisec-可选，定时器时间)
+        // 星星
+        starContext.strokeStar(50, 50, 50, 0, 'red');
+        starContext.animateStrokeStar(50, 150, 50, 0, '', 100);
+        // 月亮
+        moonContext.strokeMoon(50, 50, 50, 0, 'red');
+        moonContext.animateStrokeMoon(50, 150, 50, 0, '', 100);
+        // 多边形第五位是边长数量
+        polygonContext.strokePolygon(50, 50, 50, -18, 5, 'red');
+        polygonContext.animateStrokePolygon(50, 150, 50, 0, 5, '', 100);
+        // 不规则图形参数(r-半径, x-x坐标, y-y坐标, strokeColor-可选，线颜色, millisec-可选，定时器时间)
+        // 玫瑰线
+        roseContext.strokeRose(50, 50, 50, 'red');
+        roseContext.animateStrokeRose(50, 150, 50, 'red', 10);
+        // 心形
+        heartContext.strokeHeart(2, 50, 50, '');
+        heartContext.animateStrokeHeart(2, 150, 50, '', 10);
+        // 雪花
+        snowFlakeContext.strokeSnowFlake(50, 0, 0, 'red');
+        snowFlakeContext.animateStrokeSnowFlake(50, 100, 0, '', 500);
+    };
+    </script>
+</body>
+
+</html>

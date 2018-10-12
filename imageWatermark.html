@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>imageWatermark</title>
+    <style type="text/css">
+    body {
+        background-color: #000;
+    }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" style="display: block; margin: 0 auto; border: 1px solid #eee;">您的浏览器尚不支持Canvas</canvas>
+    <input id="scale-range" type="range" min="0.5" max="4.0" step="0.01" value="1.0" style="display: block; margin: 20px auto; width: 800px;">
+    <script>
+    var canvas = document.getElementById('canvas');
+    var slider = document.getElementById('scale-range');
+    var context = canvas.getContext('2d');
+    var image = new Image();
+
+    var watermarkCanvas; // 水印canvas
+
+    canvas.width = 800;
+    canvas.height = 532;
+    window.onload = function() {	
+        image.src = 'images/img_lg.jpg';
+        var scale = slider.value;
+        image.onload = function() {
+            drawImageByScale(scale);
+            slider.addEventListener('mousemove', function() {
+                scale = slider.value;
+                drawImageByScale(scale);
+            });
+        };
+    };
+
+    function drawImageByScale(scale) {
+        var imageWidth = canvas.width * scale;
+        var imageHeight = canvas.height * scale;
+        var sx = (canvas.width - imageWidth) / 2;
+        var sy = (canvas.height - imageHeight) / 2;
+        var watermarkCanvas = drawWatermarkCanvas();
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, sx, sy, imageWidth, imageHeight);
+        // 文字绘制到右下角
+        context.drawImage(watermarkCanvas, canvas.width - watermarkCanvas.width, canvas.height - watermarkCanvas.height);
+    }
+    // 离屏canvas绘制水印
+    function drawWatermarkCanvas() {
+        var watermarkCanvas = document.createElement('canvas');
+        var watermarkContext = watermarkCanvas.getContext('2d');
+
+        watermarkCanvas.width = 450;
+        watermarkCanvas.height = 50;
+
+        //setup watermark canvas
+        watermarkContext.font = 'bold 30px Arial';
+        watermarkContext.lineWidth = '1';
+        watermarkContext.fillStyle = 'rgba( 255 , 255 , 255 , 0.5 )';
+        watermarkContext.textBaseline = 'middle';
+        watermarkContext.fillText('== Photo on Visual Hunt ==', 30, 25);
+
+        return watermarkCanvas;
+    }
+    </script>
+</body>
+
+</html>

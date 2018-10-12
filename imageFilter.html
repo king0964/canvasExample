@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>imageFilter</title>
+    <style type="text/css">
+    .wrapper {
+        text-align: center;
+    }
+
+    .filterButton {
+        text-align: center;
+        margin-top: 50px;
+    }
+
+    .filterButton a {
+        padding: 0 6px;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <canvas id="canvasa" style="border: 1px solid #000;">您的浏览器尚不支持Canvas</canvas>
+        <canvas id="canvasb" style="border: 1px solid #000; margin-left: 60px;">您的浏览器尚不支持Canvas</canvas>
+    </div>
+    <div class="filterButton">
+        <a href="#" id="greyEffect">Grey Effect</a>
+        <a href="#" id="bwEffect">Black and White Effect</a>
+        <a href="#" id="reverseEffect">Reverse Effect</a>
+        <a href="#" id="blurEffect">Blur Effect</a>
+        <a href="#" id="mosaicEffect">Mosaic Effect</a>
+    </div>
+    <script>
+    var canvasa = document.getElementById('canvasa');
+    var contexta = canvasa.getContext('2d');
+
+    var canvasb = document.getElementById('canvasb');
+    var contextb = canvasb.getContext('2d');
+
+    var greyEffect = document.getElementById('greyEffect');
+    var bwEffect = document.getElementById('bwEffect');
+    var reverseEffect = document.getElementById('reverseEffect');
+    var blurEffect = document.getElementById('blurEffect');
+    var mosaicEffect = document.getElementById('mosaicEffect');
+
+    var r, g, b; //存储通道数据
+
+    canvasa.width = 600;
+    canvasa.height = 420;
+    canvasb.width = 600;
+    canvasb.height = 420;
+
+    window.onload = function() {
+        var image = new Image();
+        // image.crossOrigin = 'anonymous'; //跨域
+        image.src = 'images/autumn.jpg';
+
+        image.onload = function() {
+            contexta.drawImage(image, 0, 0, canvasa.width, canvasa.height);
+        };
+    };
+
+    // 灰色效果
+    greyEffect.onclick = function(e) {
+        e.preventDefault();
+        var imageData = contexta.getImageData(0, 0, canvasa.width, canvasa.height); //存储画布内容
+        var pixelData = imageData.data; //存储画布像素
+        // console.log(imageData.data);
+        for (var i = 0; i < canvasb.width * canvasb.height; i++) {
+            r = pixelData[i * 4 + 0];
+            g = pixelData[i * 4 + 1];
+            b = pixelData[i * 4 + 2];
+
+            var grey = r * 0.3 + g * 0.59 + b * 0.11;
+            pixelData[i * 4 + 0] = grey;
+            pixelData[i * 4 + 1] = grey;
+            pixelData[i * 4 + 2] = grey;
+        }
+        // console.log(imageData.data);
+        contextb.clearRect(0, 0, canvasb.width, canvasb.height);
+        contextb.putImageData(imageData, 0, 0, 0, 0, canvasb.width, canvasb.height);
+    };
+    // 黑白效果
+    bwEffect.onclick = function(e) {
+        e.preventDefault();
+        var imageData = contexta.getImageData(0, 0, canvasa.width, canvasa.height); //存储画布内容
+        var pixelData = imageData.data; //存储画布像素
+        for (var i = 0; i < canvasb.width * canvasb.height; i++) {
+            r = pixelData[i * 4 + 0];
+            g = pixelData[i * 4 + 1];
+            b = pixelData[i * 4 + 2];
+
+            var grey = r * 0.3 + g * 0.59 + b * 0.11;
+            pixelData[i * 4 + 0] = grey > 125 ? 255 : 0;
+            pixelData[i * 4 + 1] = grey > 125 ? 255 : 0;
+            pixelData[i * 4 + 2] = grey > 125 ? 255 : 0;
+        }
+        // console.log(imageData.data);
+        contextb.clearRect(0, 0, canvasb.width, canvasb.height);
+        contextb.putImageData(imageData, 0, 0, 0, 0, canvasb.width, canvasb.height);
+    };
+    // 反色效果
+    reverseEffect.onclick = function(e) {
+        e.preventDefault();
+        var imageData = contexta.getImageData(0, 0, canvasa.width, canvasa.height); //存储画布内容
+        var pixelData = imageData.data; //存储画布像素
+        for (var i = 0; i < canvasb.width * canvasb.height; i++) {
+            r = pixelData[i * 4 + 0];
+            g = pixelData[i * 4 + 1];
+            b = pixelData[i * 4 + 2];
+
+            pixelData[i * 4 + 0] = 255 - r;
+            pixelData[i * 4 + 1] = 255 - g;
+            pixelData[i * 4 + 2] = 255 - b;
+        }
+        // console.log(imageData.data);
+        contextb.clearRect(0, 0, canvasb.width, canvasb.height);
+        contextb.putImageData(imageData, 0, 0, 0, 0, canvasb.width, canvasb.height);
+    };
+    // 模糊效果（原理：取blurR为模糊半径，越大越模糊，循环blurR累加R G B，除以总数量并赋值产生模糊效果）
+    blurEffect.onclick = function(e) {
+        e.preventDefault();
+        var tmpImageData = contexta.getImageData(0, 0, canvasa.width, canvasa.height);
+        var tmpPixelData = tmpImageData.data;
+
+        var imageData = contexta.getImageData(0, 0, canvasa.width, canvasa.height);
+        var pixelData = imageData.data;
+
+        var blurR = 5;
+        // var totalnum = (2*blurR + 1)*(2*blurR + 1)
+
+        for (var i = 0; i < canvasb.height; i++) {
+            for (var j = 0; j < canvasb.width; j++) {
+                var totalr = 0,
+                    totalg = 0,
+                    totalb = 0,
+                    totalnum = 0;
+                for (var dx = -blurR; dx <= blurR; dx++) {
+                    for (var dy = -blurR; dy <= blurR; dy++) {
+                        var x = i + dx;
+                        var y = j + dy;
+                        if (x < 0 || y < 0 || x >= canvasb.height || y >= canvasb.width)
+                            continue; //跳出本次循环（溢出不做数量累加）
+                        totalnum++;
+                        var p = x * canvasb.width + y;
+                        // console.log(p);
+                        totalr += tmpPixelData[p * 4 + 0];
+                        totalg += tmpPixelData[p * 4 + 1];
+                        totalb += tmpPixelData[p * 4 + 2];
+                    }
+                }
+                var n = i * canvasb.width + j;
+                pixelData[n * 4 + 0] = totalr / totalnum;
+                pixelData[n * 4 + 1] = totalg / totalnum;
+                pixelData[n * 4 + 2] = totalb / totalnum;
+            }
+        }
+        contextb.clearRect(0, 0, canvasb.width, canvasb.height);
+        contextb.putImageData(imageData, 0, 0, 0, 0, canvasb.width, canvasb.height);
+    };
+    // 马赛克效果（原理：取size*size为马赛克色块大小，用size循环取平均值，然后用size再次循环赋值产生马赛克效果）
+    mosaicEffect.onclick = function(e) {
+        e.preventDefault();
+        var tmpImageData = contexta.getImageData(0, 0, canvasa.width, canvasa.height);
+        var tmpPixelData = tmpImageData.data;
+
+        var imageData = contexta.getImageData(0, 0, canvasa.width, canvasa.height);
+        var pixelData = imageData.data;
+
+        var size = 16; //用于马赛克尺寸
+        var totalnum = size * size;
+
+        for (var i = 0; i < canvasb.height; i += size) {
+            for (var j = 0; j < canvasb.width; j += size) {
+                var totalr = 0,
+                    totalg = 0,
+                    totalb = 0;
+                for (var dx = 0; dx <= size; dx++) {
+                    for (var dy = 0; dy <= size; dy++) {
+                        var x = i + dx;
+                        var y = j + dy;
+                        var p = x * canvasb.width + y;
+                        // console.log(p);
+                        totalr += tmpPixelData[p * 4 + 0];
+                        totalg += tmpPixelData[p * 4 + 1];
+                        totalb += tmpPixelData[p * 4 + 2];
+                    }
+                }
+                for (var tx = 0; tx <= size; tx++) {
+                    for (var ty = 0; ty <= size; ty++) {
+                        var sx = i + tx;
+                        var sy = j + ty;
+                        var n = sx * canvasb.width + sy;
+                        pixelData[n * 4 + 0] = totalr / totalnum;
+                        pixelData[n * 4 + 1] = totalg / totalnum;
+                        pixelData[n * 4 + 2] = totalb / totalnum;
+                    }
+                }
+
+            }
+        }
+        contextb.clearRect(0, 0, canvasb.width, canvasb.height);
+        contextb.putImageData(imageData, 0, 0, 0, 0, canvasb.width, canvasb.height);
+    };
+    </script>
+</body>
+
+</html>

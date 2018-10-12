@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="height=device-height,width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>canvas玩儿转红包照片</title>
+    <link rel="stylesheet" type="text/css" href="css/blur_canvas.css">
+</head>
+
+<body>
+    <div class="wrapper" id="wrapper">
+        <img src="images/img_lg.jpg" alt="背景图" id="blur-image">
+        <canvas id="canvas"></canvas>
+        <div class="button">
+            <button id="showImg">Show</button>
+            <button id="resetImg">Reset</button>
+        </div>
+    </div>
+    <script>
+    var showImg = document.getElementById('showImg');
+    var resetImg = document.getElementById('resetImg');
+    var wrapper = document.getElementById('wrapper');
+    var blurImage = document.getElementById('blur-image');
+
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+    var image = new Image();
+    var radius = 0,
+        initMaxRadius = 50, //原始圆形显示半径
+        diagonalLength, //对角线长度
+        clippingRegion = null, //存储左边和半径
+        initTimer, //初始化的定时器
+        timer, //图片显示的定时器
+        leftMargin = 0, //图片左边距（自适应方法是根据屏幕大小截取图片中间部分显示）
+        topMargin = 0,
+        rot = 0; //旋转角度
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    // console.log(canvas.height);
+    diagonalLength = 2 * Math.max(canvas.width, canvas.height);
+    image.src = 'images/img_lg.jpg';
+    image.onload = function() {
+        wrapper.style.width = canvas.width + 'px'; //赋值外边框宽高
+        wrapper.style.height = canvas.height + 'px';
+
+        blurImage.style.width = image.width + 'px'; //赋值图片宽高
+        blurImage.style.height = image.height + 'px';
+
+        leftMargin = (image.width - canvas.width) / 2;
+        topMargin = (image.height - canvas.height) / 2;
+        blurImage.style.left = String(-leftMargin) + 'px'; //赋值图片位置(因为有可能图片比屏幕小)
+        blurImage.style.top = String(-topMargin) + 'px';
+
+        initCanvas(image);
+    };
+    resetImg.onclick = function() {
+        if (initTimer) clearInterval(initTimer);
+        if (timer) clearInterval(timer);
+        initCanvas(image);
+    };
+    showImg.onclick = function() {
+        timer = setInterval(function() {
+            clippingRegion.r += 10; // 控制递增速度
+            if (clippingRegion.r >= diagonalLength) {
+                clearInterval(timer);
+            }
+            rot += 10;
+            console.log(rot);
+            draw(image, clippingRegion, rot);
+        }, 30);
+    };
+    // 绘制初始化圆形
+    function initCanvas(image) {
+        var theLeft = leftMargin < 0 ? -leftMargin : 0; //图片小于canvas，避免溢出需要减去
+        var theTop = topMargin < 0 ? -topMargin : 0;
+        clippingRegion = {
+            x: Math.random() * (canvas.width - 2 * initMaxRadius - 2 * theLeft) + initMaxRadius + theLeft, //这个方法避免溢出
+            y: Math.random() * (canvas.height - 2 * initMaxRadius - 2 * theTop) + initMaxRadius + theTop,
+            r: radius
+        };
+        initTimer = setInterval(function() {
+            clippingRegion.r += 5; // 控制递增速度
+            if (clippingRegion.r >= initMaxRadius) {
+                clearInterval(initTimer);
+            }
+            draw(image, clippingRegion, 0);
+        }, 30);
+    }
+    // 圆形剪切图片显示
+    function draw(image, clippingRegion, rot) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.save();
+
+        drawStar(clippingRegion.r, clippingRegion.x, clippingRegion.y, rot, '#fff');
+        context.clip();
+        // context.drawImage(image, leftMargin, topMargin, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+        // 复杂写法是为了兼容图片宽高小于画布宽高
+        context.drawImage(image, Math.max(leftMargin, 0), Math.max(topMargin, 0), Math.min(canvas.width, image.width), Math.min(canvas.height, image.height), Math.max(0, -leftMargin), Math.max(0, -topMargin), Math.min(canvas.width, image.width), Math.min(canvas.height, image.height));
+
+        context.restore();
+    }
+    // 绘制五角星
+    function drawStar(r, x, y, rot, strokeColor) {
+        // 路径
+        context.beginPath();
+        for (i = 0; i < 5; i++) {
+            context.lineTo(Math.cos((18 + i * 72 - rot) / 180 * Math.PI) * r + x, -Math.sin((18 + i * 72 - rot) / 180 * Math.PI) * r + y);
+            context.lineTo(Math.cos((54 + i * 72 - rot) / 180 * Math.PI) * r * 0.5 + x, -Math.sin((54 + i * 72 - rot) / 180 * Math.PI) * r * 0.5 + y);
+        }
+        context.closePath();
+        // 状态
+        context.strokeStyle = strokeColor;
+        // 设置
+        context.stroke();
+    }
+    </script>
+</body>
+
+</html>
