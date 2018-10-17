@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="height=device-height,width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>handWriting</title>
+	<link rel="stylesheet" type="text/css" href="css/handWriting.css">
+</head>
+<body>
+	<div id="wrapper">
+		<canvas id="offCanvas"></canvas>
+		<canvas id="canvas"></canvas>
+		<div id="control-button">
+			<div id="colors">
+				<span id="black-btn" class="color-btn color-btn-selected"></span>
+				<span id="blue-btn" class="color-btn"></span>
+				<span id="green-btn" class="color-btn"></span>
+				<span id="red-btn" class="color-btn"></span>
+				<!-- <span id="orange-btn" class="color-btn"></span> -->
+			</div>
+			<div class="ctroller">
+				<span id="changeBg">
+					<select>
+						<option value="default">默认</option>
+						<option value="white">白色</option>
+						<option value="yellow">黄色</option>
+					</select>
+				</span>
+				<span id="clearCanvas">清空</span>
+				<span id="saveImg">保存</span>
+			</div>
+		</div>
+	</div>
+	<script src="js/handWriting.js"></script>
+</body>
+</html>

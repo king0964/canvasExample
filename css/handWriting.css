@@ -1,0 +1,70 @@
+* {
+	padding: 0;
+	margin: 0;
+}
+#wrapper {
+	margin: 10px auto;
+	position: relative;
+}
+#wrapper #offCanvas, #wrapper #canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+#control-button {
+	position: absolute;
+	width: 100%;
+	margin-top: 10px;
+	overflow: hidden;
+}
+#control-button #colors {
+	float: left;
+}
+#control-button .color-btn {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	cursor: pointer;
+	border: 5px solid #fff;
+}
+#control-button .color-btn.color-btn-selected {
+	border-color: blueviolet;
+}
+#control-button .color-btn:hover {
+	border-color: violet;
+}
+#black-btn {
+	background-color: black;
+}
+#blue-btn {
+	background-color: blue;
+}
+#green-btn {
+	background-color: green;
+}
+#red-btn {
+	background-color: red;
+}
+#orange-btn {
+	background-color: orange;
+}
+.ctroller {
+	float: right;
+}
+#changeBg select {
+	height: 30px;
+	line-height: 30px;
+	vertical-align: bottom;
+}
+#clearCanvas, #saveImg {
+	display: inline-block;
+	border: 1px solid #aaa;
+	height: 28px;
+	line-height: 28px;
+	padding: 0 10px;
+	cursor: pointer;
+	text-align: center;
+}
+#clearCanvas:hover, #saveImg:hover {
+	background-color: #def;
+}
